@@ -1,7 +1,7 @@
 import { isAxiosError } from 'axios'
 import { type FormEvent, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../providers/AuthProvider'
+import { useAuth } from '../../hooks/useAuth'
 
 function resolveErrorMessage(error: unknown): string {
   if (isAxiosError(error)) {
