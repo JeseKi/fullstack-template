@@ -11,6 +11,10 @@
 ## 数据流
 - 路由 -> 依赖注入 `get_db` -> `asyncio.to_thread` 包裹同步 ORM -> SQLAlchemy -> SQLite
 
+## 规范说明
+- 本项目中，为了保持模型的简洁性和可维护性，禁止在模型中使用外键关系。
+  所有跨表关联应通过服务层手动处理，以提高灵活性和降低耦合度。
+
 ## 测试结构
 - `test_example_router.py` - 路由层测试（API接口测试）
 - `test_example_service.py` - 服务层测试（业务逻辑测试）
