@@ -17,7 +17,7 @@ from pathlib import Path
 from loguru import logger
 
 if __name__ == "__main__":
-    logger.info("Backend Template 启动！")
+    logger.info("Fullstack Template 启动！")
     load_dotenv(Path.cwd() / ".env")
     logger.info(f"当前应用环境：{os.getenv('APP_ENV')}")
 
