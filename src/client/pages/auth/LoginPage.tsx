@@ -1,5 +1,22 @@
 import { isAxiosError } from 'axios'
-import { type FormEvent, useEffect, useState } from 'react'
+import {
+  Alert,
+  App,
+  Button,
+  Card,
+  Flex,
+  Form,
+  Input,
+  Space,
+  Spin,
+  Typography,
+} from 'antd'
+import {
+  LockOutlined,
+  LoginOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -18,8 +35,9 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login, loading, isAuthenticated } = useAuth()
+  const { message } = App.useApp()
 
-  const [form, setForm] = useState({ username: '', password: '' })
+  const [form] = Form.useForm<{ username: string; password: string }>()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -29,17 +47,21 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, loading, navigate])
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleSubmit = async (values: { username: string; password: string }) => {
+    console.log('【登录页面】提交数据', { 用户名: values.username })
     setSubmitting(true)
     setError(null)
     try {
-      await login(form)
+      await login(values)
       const fromState = location.state as { from?: { pathname?: string } } | undefined
       const redirectPath = fromState?.from?.pathname ?? '/'
+      message.success('欢迎回来')
       navigate(redirectPath, { replace: true })
     } catch (err) {
-      setError(resolveErrorMessage(err))
+      console.error('【登录页面】调用登录接口失败', err)
+      const text = resolveErrorMessage(err)
+      setError(text)
+      message.error(text)
     } finally {
       setSubmitting(false)
     }
@@ -47,70 +69,92 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-slate-600">
-        正在加载，请稍候...
-      </div>
+      <Flex
+        align="center"
+        justify="center"
+        style={{ minHeight: '100vh' }}
+      >
+        <Spin tip="正在验证登录状态" size="large" />
+      </Flex>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-2 text-2xl font-semibold text-slate-900">登录</h1>
-        <p className="mb-6 text-sm text-slate-600">输入账号密码以访问受保护的功能模块。</p>
-        {error && (
-          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-            {error}
+    <Flex
+      align="center"
+      justify="center"
+      style={{ minHeight: '100vh', padding: '48px 16px' }}
+    >
+      <Card
+        bordered={false}
+        style={{ width: '100%', maxWidth: 420, boxShadow: '0 16px 40px rgba(15, 23, 42, 0.12)' }}
+      >
+        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+          <div>
+            <Typography.Title level={3} style={{ marginBottom: 8 }}>
+              欢迎回来
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              输入账号信息以访问现代化的前端模板。
+            </Typography.Text>
           </div>
-        )}
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-slate-700" htmlFor="username">
-              用户名
-            </label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              value={form.username}
-              onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
-              placeholder="请输入用户名"
-              autoComplete="username"
-              required
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-slate-700" htmlFor="password">
-              密码
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
-              placeholder="请输入密码"
-              autoComplete="current-password"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-md bg-slate-900 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+          {error && <Alert type="error" showIcon message={error} />}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            requiredMark={false}
+            autoComplete="on"
           >
-            {submitting ? '登录中...' : '登录'}
-          </button>
-        </form>
-        <p className="mt-6 text-center text-sm text-slate-600">
-          还没有账号？
-          <Link to="/register" className="ml-1 text-slate-900 hover:underline">
-            立即注册
-          </Link>
-        </p>
-      </div>
-    </div>
+            <Form.Item
+              label="用户名"
+              name="username"
+              rules={[
+                { required: true, message: '请输入用户名' },
+                { min: 3, message: '用户名至少 3 个字符' },
+              ]}
+            >
+              <Input
+                size="large"
+                prefix={<UserOutlined />}
+                placeholder="请输入用户名"
+                autoComplete="username"
+                allowClear
+              />
+            </Form.Item>
+            <Form.Item
+              label="密码"
+              name="password"
+              rules={[{ required: true, message: '请输入密码' }]}
+            >
+              <Input.Password
+                size="large"
+                prefix={<LockOutlined />}
+                placeholder="请输入密码"
+                autoComplete="current-password"
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                icon={<LoginOutlined />}
+                loading={submitting}
+                block
+              >
+                登录
+              </Button>
+            </Form.Item>
+          </Form>
+          <Flex justify="center" gap={8}>
+            <Typography.Text type="secondary">还没有账号？</Typography.Text>
+            <Link to="/register" className="font-medium text-sky-600">
+              立即注册
+            </Link>
+          </Flex>
+        </Space>
+      </Card>
+    </Flex>
   )
 }

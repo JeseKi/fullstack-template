@@ -1,44 +1,131 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
+import {
+  Avatar,
+  Dropdown,
+  Flex,
+  Layout,
+  Menu,
+  type MenuProps,
+  Typography,
+  theme,
+} from 'antd'
+import {
+  LogoutOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+
+const { Header, Content } = Layout
 
 export default function MainLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { token } = theme.useToken()
   const { user, logout } = useAuth()
+
+  const selectedKeys = useMemo(() => {
+    if (location.pathname.startsWith('/')) {
+      return ['dashboard']
+    }
+    return []
+  }, [location.pathname])
+
+  const navItems = useMemo<MenuProps['items']>(
+    () => [
+      {
+        key: 'dashboard',
+        label: <Link to="/">示例模块</Link>,
+      },
+    ],
+    [],
+  )
 
   const handleLogout = () => {
     logout()
     navigate('/login', { replace: true })
   }
 
+  const userMenu = useMemo<MenuProps['items']>(
+    () => [
+      {
+        key: 'profile',
+        label: (
+          <Flex vertical gap={2} style={{ minWidth: 180 }}>
+            <Typography.Text type="secondary">当前用户</Typography.Text>
+            <Typography.Text strong>{user?.username ?? '未登录'}</Typography.Text>
+          </Flex>
+        ),
+        disabled: true,
+      },
+      { type: 'divider' },
+      {
+        key: 'logout',
+        icon: <LogoutOutlined />,
+        label: '退出登录',
+      },
+    ],
+    [user?.username],
+  )
+
+  const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'logout') {
+      handleLogout()
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link to="/" className="text-lg font-semibold text-slate-900">
+    <Layout style={{ minHeight: '100vh', background: token.colorBgLayout }}>
+      <Header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingInline: 24,
+          paddingBlock: 12,
+          background: token.colorBgElevated,
+          boxShadow: '0 2px 12px rgba(15, 23, 42, 0.06)',
+        }}
+      >
+        <Flex align="center" gap={16}>
+          <Link to="/" className="text-base font-semibold text-slate-900">
             Fullstack Template
           </Link>
-          <nav className="flex items-center gap-4 text-sm text-slate-600">
-            <Link to="/" className="hover:text-slate-900">
-              示例模块
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <div className="text-sm text-slate-600">
-              {user ? `你好，${user.username}` : '未登录'}
+          <Menu
+            mode="horizontal"
+            selectedKeys={selectedKeys}
+            items={navItems}
+            style={{ borderBottom: 'none', background: 'transparent' }}
+          />
+        </Flex>
+        <Dropdown menu={{ items: userMenu, onClick: handleUserMenuClick }} placement="bottomRight" arrow>
+          <Flex align="center" gap={12} className="cursor-pointer">
+            <div className="text-right leading-tight">
+              <Typography.Text style={{ display: 'block', fontWeight: 600 }}>
+                {user?.name ?? user?.username ?? '访客'}
+              </Typography.Text>
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                {user?.email ?? '未绑定邮箱'}
+              </Typography.Text>
             </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-md border border-slate-200 px-3 py-1 text-sm text-slate-700 transition hover:bg-slate-100"
-            >
-              退出登录
-            </button>
-          </div>
+            <Avatar size="large" icon={<UserOutlined />} style={{ background: token.colorPrimary }} />
+          </Flex>
+        </Dropdown>
+      </Header>
+      <Content style={{ padding: '32px 24px 48px' }}>
+        <div
+          style={{
+            margin: '0 auto',
+            maxWidth: 1120,
+            width: '100%',
+          }}
+        >
+          <Outlet />
         </div>
-      </header>
-      <main className="mx-auto max-w-5xl px-6 py-6">
-        <Outlet />
-      </main>
-    </div>
+      </Content>
+    </Layout>
   )
 }

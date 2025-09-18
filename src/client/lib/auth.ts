@@ -10,7 +10,9 @@ import type {
 } from './types'
 
 export async function login(payload: LoginPayload): Promise<TokenResponse> {
+  console.log('【Auth API】准备发送登录请求', { 用户名: payload.username })
   const { data } = await api.post<TokenResponse>('/auth/login', payload)
+  console.log('【Auth API】登录请求返回', { tokenType: data.token_type })
   setTokens(data.access_token, data.refresh_token)
   return data
 }
