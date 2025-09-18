@@ -16,3 +16,4 @@ pytest
 pytest-asyncio
 httpx
 httpx[socks]
+types-python-jose

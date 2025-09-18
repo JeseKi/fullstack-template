@@ -92,6 +92,10 @@ starlette==0.38.6
     # via fastapi
 ty==0.0.1a20
     # via -r requirements.in
+types-pyasn1==0.6.0.20250914
+    # via types-python-jose
+types-python-jose==3.5.0.20250531
+    # via -r requirements.in
 typing-extensions==4.15.0
     # via
     #   anyio
