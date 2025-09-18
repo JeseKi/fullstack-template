@@ -15,7 +15,7 @@ import argparse
 from pathlib import Path
 from loguru import logger
 
-from database import init_database, get_database_info, engine
+from src.server.database import init_database, get_database_info, engine
 
 
 def reset_database() -> None:

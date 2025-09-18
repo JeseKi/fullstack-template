@@ -5,8 +5,8 @@
 
 from sqlalchemy.orm import Session
 
-from auth.dao import UserDAO
-from auth.models import User
+from src.server.auth.dao import UserDAO
+from src.server.auth.models import User
 
 
 def test_user_dao_get_by_username(test_db_session: Session):

@@ -13,10 +13,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from database import get_db
+from src.server.database import get_db
 from .schemas import ItemCreate, ItemOut
 from . import service
-from dao.dao_base import run_in_thread
+from src.server.dao.dao_base import run_in_thread
 
 router = APIRouter(prefix="/api/example", tags=["example"])
 

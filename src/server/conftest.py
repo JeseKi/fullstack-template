@@ -42,9 +42,9 @@ def test_db_engine() -> Iterator[Connection]:
 
     keep_conn = engine.connect()
 
-    from database import Base
-    import auth.models  # noqa: F401
-    import example_module.models  # noqa: F401
+    from src.server.database import Base
+    import src.server.auth.models  # noqa: F401
+    import src.server.auth.models  # noqa: F401
 
     Base.metadata.create_all(bind=keep_conn)
 
@@ -73,8 +73,8 @@ def test_db_session(test_db_engine) -> Iterator[Session]:
 @pytest.fixture(scope="function")
 def test_client(test_db_session: Session) -> Iterator[TestClient]:
     """提供一个配置了测试数据库的 FastAPI TestClient。"""
-    from main import app
-    from database import get_db
+    from src.server.main import app
+    from src.server.database import get_db
 
     def override_get_db() -> Iterator[Session]:
         yield test_db_session
@@ -93,7 +93,7 @@ def init_test_database(test_db_engine) -> None:
     )
     session = TestingSessionLocal()
     try:
-        from auth.models import User
+        from src.server.auth.models import User
 
         exists = session.query(User).order_by(User.id.asc()).first()
         if not exists:

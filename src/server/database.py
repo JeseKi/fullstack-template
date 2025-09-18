@@ -26,8 +26,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from pathlib import Path
 from loguru import logger
 
-from config import global_config
-from schemas import DatabaseInfo
+from src.server.config import global_config
+from src.server.schemas import DatabaseInfo
 
 Base: Any = declarative_base()
 PROJECT_ROOT = Path.cwd()
@@ -71,8 +71,8 @@ def init_database() -> None:
 
     # 延迟导入模型，避免循环依赖
     try:
-        from auth import models as _1  # noqa
-        from example_module import models as _2  # noqa
+        from src.server.auth import models as _1  # noqa
+        from src.server.example_module import models as _2  # noqa
     except Exception as e:
         logger.warning(f"导入模型时出现警告：{e}")
 
@@ -87,7 +87,7 @@ def init_database() -> None:
 
     # 引导：创建初始管理员（如不存在）
     try:
-        from auth.service import bootstrap_default_admin  # 延迟导入避免循环
+        from src.server.auth.service import bootstrap_default_admin  # 延迟导入避免循环
 
         bootstrap_default_admin(SessionLocal())
     except Exception as e:

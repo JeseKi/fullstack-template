@@ -6,8 +6,8 @@
 import pytest
 from sqlalchemy.orm import Session
 
-from example_module.dao import ExampleItemDAO
-from example_module.models import Item
+from src.server.example_module.dao import ExampleItemDAO
+from src.server.example_module.models import Item
 
 
 def test_example_item_dao_create(test_db_session: Session):

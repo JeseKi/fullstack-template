@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from dao.dao_base import BaseDAO
+from src.server.dao.dao_base import BaseDAO
 from .models import User
 
 

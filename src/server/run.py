@@ -22,9 +22,9 @@ if __name__ == "__main__":
     logger.info(f"当前应用环境：{os.getenv('APP_ENV')}")
 
     uvicorn.run(
-        "main:app",
+        "src.server.main:app",
         host="0.0.0.0",
-        port=int(os.getenv("PORT", "4000")),
+        port=int(os.getenv("PORT", "8000")),
         reload=True,
         log_level=os.getenv("LOG_LEVEL", "info").lower(),
     )

@@ -7,8 +7,8 @@ import pytest
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from example_module.models import Item
-from example_module.service import create_item, get_item
+from src.server.example_module.models import Item
+from src.server.example_module.service import create_item, get_item
 
 
 def test_create_item(test_db_session: Session):

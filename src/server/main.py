@@ -18,12 +18,12 @@ from loguru import logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import global_config
-from database import init_database, get_database_info
+from src.server.config import global_config
+from src.server.database import init_database, get_database_info
 
 # 路由模块
-from auth.router import router as auth_router
-from example_module.router import router as example_router
+from src.server.auth.router import router as auth_router
+from src.server.example_module.router import router as example_router
 
 
 @asynccontextmanager

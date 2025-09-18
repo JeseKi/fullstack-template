@@ -7,9 +7,9 @@ from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
-from auth.models import User
-from auth.schemas import UserCreate, UserUpdate
-from auth.service import (
+from src.server.auth.models import User
+from src.server.auth.schemas import UserCreate, UserUpdate
+from src.server.auth.service import (
     get_user_by_username,
     authenticate_user,
     create_access_token,

@@ -18,8 +18,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from database import get_db
-from config import global_config
+from src.server.database import get_db
+from src.server.config import global_config
 from .config import auth_config
 from .models import User
 from . import service
