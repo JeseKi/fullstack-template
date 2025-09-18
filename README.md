@@ -12,7 +12,7 @@
 
 ## 结构
 ```
-backend_template/
+./
 ├── main.py                # 应用入口（初始化DB，挂载 auth/example）
 ├── run.py                 # 本地启动
 ├── config.py              # 全局配置（APP_ENV/CORS/DB路径）
@@ -39,13 +39,13 @@ conda activate backend-template
 pip install -r requirements.txt
 
 # 开发运行
-python backend_template/run.py
+python run.py
 # 或
-uvicorn backend_template.main:app --reload --port 4000
+uvicorn main:app --reload --port 4000
 
 # 初始化数据库（可选）
-python -m backend_template.scripts.initdb --check
-python -m backend_template.scripts.initdb --reset
+python -m scripts.initdb --check
+python -m scripts.initdb --reset
 ```
 
 ## 环境变量（.env）
@@ -53,7 +53,7 @@ python -m backend_template.scripts.initdb --reset
 APP_ENV=dev
 APP_SECRET_KEY=change-me
 ALLOWED_ORIGINS=["http://localhost:3000"]
-DATABASE_PATH=backend_template.db
+DATABASE_PATH=database.db
 ```
 
 ## 新增模块步骤
@@ -69,7 +69,7 @@ DATABASE_PATH=backend_template.db
 
 ## DAO 层最佳实践
 - 何时使用 DAO：当服务层中出现复用的持久化逻辑或单元测试需要隔离数据库访问细节时。
-- 放置位置：`backend_template/dao/dao_base.py` 提供基类与线程池工具；各模块在自身目录下定义 `dao.py`。
+- 放置位置：`dao/dao_base.py` 提供基类与线程池工具；各模块在自身目录下定义 `dao.py`。
 - 约定：
   - DAO 类继承 `BaseDAO`，构造函数接收 `Session`。
   - DAO 方法只做持久化操作，不承载业务规则（业务在 service 层）。

@@ -13,6 +13,7 @@ pytest 公共 fixtures（模板版）
 - `test_client`
 - `init_test_database`
 """
+
 from __future__ import annotations
 
 import os
@@ -23,11 +24,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Connection
 
 # 测试环境配置
 os.environ.setdefault("APP_ENV", "test")
-os.environ.setdefault("ALLOWED_ORIGINS", "[\"http://localhost:3000\"]")
+os.environ.setdefault("ALLOWED_ORIGINS", '["http://localhost:3000"]')
 
 
 @pytest.fixture(scope="function")
@@ -59,7 +60,9 @@ def test_db_engine() -> Iterator[Connection]:
 @pytest.fixture(scope="function")
 def test_db_session(test_db_engine) -> Iterator[Session]:
     """提供内存数据库会话。"""
-    TestingSessionLocal = sessionmaker(bind=test_db_engine, autocommit=False, autoflush=False)
+    TestingSessionLocal = sessionmaker(
+        bind=test_db_engine, autocommit=False, autoflush=False
+    )
     session = TestingSessionLocal()
     try:
         yield session
@@ -85,7 +88,9 @@ def test_client(test_db_session: Session) -> Iterator[TestClient]:
 @pytest.fixture(scope="function")
 def init_test_database(test_db_engine) -> None:
     """初始化默认管理员等必要基础数据。"""
-    TestingSessionLocal = sessionmaker(bind=test_db_engine, autocommit=False, autoflush=False)
+    TestingSessionLocal = sessionmaker(
+        bind=test_db_engine, autocommit=False, autoflush=False
+    )
     session = TestingSessionLocal()
     try:
         from auth.models import User

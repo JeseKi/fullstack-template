@@ -1,3 +1,7 @@
+uv
+ruff
+ty
+mypy
 fastapi
 uvicorn
 sqlalchemy

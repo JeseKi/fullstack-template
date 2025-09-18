@@ -12,6 +12,7 @@ FastAPI 应用入口（模板版）
 - 启动时初始化数据库
 - 仅挂载 `auth` 与 `example_module` 两个模块
 """
+
 from contextlib import asynccontextmanager
 from loguru import logger
 from fastapi import FastAPI

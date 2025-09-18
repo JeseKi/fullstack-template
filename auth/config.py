@@ -5,6 +5,7 @@
 公开接口：
 - `auth_config`
 """
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
 

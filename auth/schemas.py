@@ -5,6 +5,7 @@
 公开接口：
 - `UserProfile`、`UserCreate`、`UserUpdate`、`UserLogin`、`TokenResponse`、`PasswordChange`
 """
+
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Optional
 

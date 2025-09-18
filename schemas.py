@@ -11,6 +11,7 @@
 说明：
 - 跨模块轻量共享的数据模型放在此处
 """
+
 from pydantic import BaseModel
 from typing import Optional
 

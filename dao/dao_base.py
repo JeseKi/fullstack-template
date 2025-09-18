@@ -12,6 +12,7 @@
 说明：
 - 用于在服务或路由中将阻塞型 ORM 调用切换至线程池，避免阻塞事件循环。
 """
+
 import asyncio
 from typing import Any, Callable
 from sqlalchemy.orm import Session

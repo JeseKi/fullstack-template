@@ -16,6 +16,7 @@
 说明：
 - 使用 SQLite，路由中通过 `asyncio.to_thread` 调用同步 ORM，避免阻塞事件循环。
 """
+
 from __future__ import annotations
 
 import os
@@ -70,8 +71,8 @@ def init_database() -> None:
 
     # 延迟导入模型，避免循环依赖
     try:
-        from auth import models  # noqa
-        from example_module import models  # noqa
+        from auth import models as _1  # noqa
+        from example_module import models as _2  # noqa
     except Exception as e:
         logger.warning(f"导入模型时出现警告：{e}")
 

@@ -4,17 +4,18 @@
 初始化/检查模板数据库的 CLI
 
 用法：
-- python -m backend_template.scripts.initdb --check   # 检查表
-- python -m backend_template.scripts.initdb --reset   # 重置并初始化
-- python -m backend_template.scripts.initdb           # 仅初始化（若不存在）
+- python -m scripts.initdb --check   # 检查表
+- python -m scripts.initdb --reset   # 重置并初始化
+- python -m scripts.initdb           # 仅初始化（若不存在）
 """
+
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 from loguru import logger
 
-from database import init_database, get_database_info, engine, Base
+from database import init_database, get_database_info, engine
 
 
 def reset_database() -> None:
@@ -41,7 +42,9 @@ def check_status() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="模板数据库工具")
-    parser.add_argument("--reset", action="store_true", help="重置数据库（删除后再初始化）")
+    parser.add_argument(
+        "--reset", action="store_true", help="重置数据库（删除后再初始化）"
+    )
     parser.add_argument("--check", action="store_true", help="检查数据库状态")
     args = parser.parse_args()
 

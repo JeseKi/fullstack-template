@@ -12,6 +12,7 @@
 说明：
 - 服务层承载业务逻辑，路由层只做参数校验与装配。
 """
+
 from __future__ import annotations
 
 from sqlalchemy.orm import Session
@@ -26,7 +27,9 @@ def create_item(db: Session, name: str) -> Item:
     try:
         return dao.create(name)
     except ValueError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="名称已存在")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="名称已存在"
+        )
 
 
 def get_item(db: Session, item_id: int) -> Item:

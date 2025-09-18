@@ -6,7 +6,11 @@ def test_register_and_login_flow(test_client):
     # 注册
     resp = test_client.post(
         "/api/auth/register",
-        json={"username": "alice", "email": "alice@example.com", "password": "Password123"},
+        json={
+            "username": "alice",
+            "email": "alice@example.com",
+            "password": "Password123",
+        },
     )
     assert resp.status_code == 201, resp.text
 
@@ -42,7 +46,11 @@ def test_change_password_flow(test_client):
     # 注册
     test_client.post(
         "/api/auth/register",
-        json={"username": "bob", "email": "bob@example.com", "password": "OldPassword123"},
+        json={
+            "username": "bob",
+            "email": "bob@example.com",
+            "password": "OldPassword123",
+        },
     )
     # 登录
     login = test_client.post(

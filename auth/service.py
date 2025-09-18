@@ -9,6 +9,7 @@
 - create_user / update_user / change_password
 - bootstrap_default_admin
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -41,7 +42,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expires_delta or timedelta(minutes=auth_config.access_token_ttl_minutes)
     )
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, auth_config.jwt_secret_key, algorithm=auth_config.jwt_algorithm)
+    return jwt.encode(
+        to_encode, auth_config.jwt_secret_key, algorithm=auth_config.jwt_algorithm
+    )
 
 
 def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -50,7 +53,9 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) 
         expires_delta or timedelta(days=auth_config.refresh_token_ttl_days)
     )
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, auth_config.jwt_secret_key, algorithm=auth_config.jwt_algorithm)
+    return jwt.encode(
+        to_encode, auth_config.jwt_secret_key, algorithm=auth_config.jwt_algorithm
+    )
 
 
 def create_user(db: Session, user_data: UserCreate) -> User:
@@ -65,7 +70,9 @@ def update_user(db: Session, user: User, user_data: UserUpdate) -> User:
     return UserDAO(db).update(user, **update_data)
 
 
-def change_password(db: Session, user: User, old_password: str, new_password: str) -> bool:
+def change_password(
+    db: Session, user: User, old_password: str, new_password: str
+) -> bool:
     if not user.check_password(old_password):
         return False
     user.set_password(new_password)
@@ -82,7 +89,9 @@ def bootstrap_default_admin(session: Session) -> None:
     if user:
         return
     try:
-        admin_user_data = UserCreate(username=admin_username, email=admin_email, password=password)
+        admin_user_data = UserCreate(
+            username=admin_username, email=admin_email, password=password
+        )
         new_user = create_user(session, admin_user_data)
         new_user.role = "admin"
         session.commit()

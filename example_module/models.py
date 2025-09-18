@@ -5,6 +5,7 @@
 公开接口：
 - `Item`
 """
+
 from __future__ import annotations
 
 from sqlalchemy import Integer, String

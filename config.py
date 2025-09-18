@@ -68,7 +68,9 @@ class GlobalConfig(BaseSettings):
             return [origin.strip() for origin in env_value.split(",") if origin.strip()]
         return [env_value.strip()] if env_value.strip() else ["*"]
 
-    model_config = SettingsConfigDict(env_file=None, env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=None, env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+    )
 
 
 global_config = GlobalConfig()

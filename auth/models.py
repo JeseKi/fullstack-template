@@ -8,6 +8,7 @@
 内部方法：
 - `set_password`、`check_password`
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

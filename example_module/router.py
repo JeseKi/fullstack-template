@@ -7,6 +7,7 @@
 - POST /api/example/items
 - GET /api/example/items/{item_id}
 """
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status
