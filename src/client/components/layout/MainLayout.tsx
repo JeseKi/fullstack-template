@@ -101,18 +101,19 @@ export default function MainLayout() {
             style={{ borderBottom: 'none', background: 'transparent' }}
           />
         </Flex>
-        <Dropdown menu={{ items: userMenu, onClick: handleUserMenuClick }} placement="bottomRight" arrow>
-          <Flex align="center" gap={12} className="cursor-pointer">
-            <div className="text-right leading-tight">
-              <Typography.Text style={{ display: 'block', fontWeight: 600 }}>
-                {user?.name ?? user?.username ?? '访客'}
-              </Typography.Text>
-              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                {user?.email ?? '未绑定邮箱'}
-              </Typography.Text>
-            </div>
-            <Avatar size="large" icon={<UserOutlined />} style={{ background: token.colorPrimary }} />
-          </Flex>
+        <Dropdown
+          menu={{ items: userMenu, onClick: handleUserMenuClick }}
+          placement="bottomRight"
+          arrow
+          trigger={["hover"]}
+          getPopupContainer={() => document.body}
+          overlayStyle={{ zIndex: 1000 }}
+        >
+          <Avatar
+            size="large"
+            icon={<UserOutlined />}
+            style={{ background: token.colorPrimary, cursor: 'pointer' }}
+          />
         </Dropdown>
       </Header>
       <Content style={{ padding: '32px 24px 48px' }}>
