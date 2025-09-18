@@ -11,6 +11,11 @@
 ## 数据流
 - 路由 -> 依赖注入 `get_db` -> `asyncio.to_thread` 包裹同步 ORM -> SQLAlchemy -> SQLite
 
+## 测试结构
+- `test_example_router.py` - 路由层测试（API接口测试）
+- `test_example_service.py` - 服务层测试（业务逻辑测试）
+- `test_example_dao.py` - 数据访问层测试（数据库操作测试）
+
 ## 用法示例（curl）
 ```bash
 curl http://localhost:4000/api/example/ping

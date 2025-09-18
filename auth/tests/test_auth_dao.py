@@ -3,7 +3,6 @@
 认证DAO层测试
 """
 
-import pytest
 from sqlalchemy.orm import Session
 
 from auth.dao import UserDAO
