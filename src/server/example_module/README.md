@@ -18,9 +18,9 @@
 
 ## 用法示例（curl）
 ```bash
-curl http://localhost:4000/api/example/ping
+curl http://localhost:8000/api/example/ping
 
-curl -X POST http://localhost:4000/api/example/items \
+curl -X POST http://localhost:8000/api/example/items \
   -H 'Content-Type: application/json' \
   -d '{"name":"hello"}'
 ```

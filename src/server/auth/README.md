@@ -16,11 +16,11 @@
 
 ## 用法示例（curl）
 ```bash
-curl -X POST http://localhost:4000/api/auth/register \
+curl -X POST http://localhost:8000/api/auth/register \
   -H 'Content-Type: application/json' \
   -d '{"username":"alice","email":"alice@example.com","password":"Password123"}'
 
-curl -X POST http://localhost:4000/api/auth/login \
+curl -X POST http://localhost:8000/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"username":"alice","password":"Password123"}'
 ```

@@ -50,8 +50,8 @@ class GlobalConfig(BaseSettings):
         """允许的跨域来源
 
         支持格式：
-        1. JSON：ALLOWED_ORIGINS='["http://localhost:3000"]'
-        2. 逗号分隔：ALLOWED_ORIGINS="http://localhost:3000,https://example.com"
+        1. JSON：ALLOWED_ORIGINS='["http://localhost:5173"]'
+        2. 逗号分隔：ALLOWED_ORIGINS="http://localhost:5173,https://example.com"
         3. 单个值：ALLOWED_ORIGINS="*"
         4. 未设置：默认为 ["*"]
         """
