@@ -14,8 +14,12 @@ FastAPI 应用入口（模板版）
 """
 
 from contextlib import asynccontextmanager
+import os
+
 from loguru import logger
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.server.config import global_config
@@ -55,3 +59,23 @@ app.add_middleware(
 # 挂载路由
 app.include_router(auth_router)
 app.include_router(example_router)
+
+@app.get("/", response_class=HTMLResponse)
+async def get_index(_: Request):
+    """
+    根路径，返回前端交互页面 index.html。
+    """
+    index_path = os.path.join(global_config.project_root, "dist", "index.html")
+    try:
+        with open(index_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>错误：找不到 index.html</h1>", status_code=404)
+    
+
+try:
+    app.mount(
+        "/", StaticFiles(directory=global_config.project_root / "dist", html=True), name="project_root_static"
+    )
+except Exception as e:
+    logger.error(f"挂载前端目录失败: {e}")

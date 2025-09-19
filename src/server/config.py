@@ -13,12 +13,14 @@
 - 提供 CORS 允许源解析
 """
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 import json
 from typing import List
+from pathlib import Path
+
 from dotenv import load_dotenv
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # 先加载 .env 和 .env.{APP_ENV}
 load_dotenv(".env")
@@ -44,7 +46,13 @@ class GlobalConfig(BaseSettings):
         title="应用密钥",
         description="用于会话/签名等场景（可选）",
     )
-
+    
+    project_root: Path = Field(
+        default=Path.cwd(),
+        title="项目根目录",
+        description="相对项目根目录的相对路径",
+    )
+    
     @property
     def allowed_origins(self) -> List[str]:
         """允许的跨域来源
