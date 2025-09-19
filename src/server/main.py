@@ -33,7 +33,7 @@ from src.server.example_module.router import router as example_router
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """生命周期管理：启动时检查/初始化数据库。"""
-    logger.info("正在启动模板应用...")
+    logger.info("正在启动Fullstack模板应用...")
     db_info = get_database_info()
     if not db_info.database_exists:
         logger.info("数据库不存在，正在初始化...")
@@ -46,7 +46,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Backend Template (Auth + DB + Example)", lifespan=lifespan)
+app = FastAPI(title="Fullstack Template (Auth + DB + Example)", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -60,11 +60,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(example_router)
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/{_}", response_class=HTMLResponse)
 async def get_index(_: Request):
-    """
-    根路径，返回前端交互页面 index.html。
-    """
     index_path = os.path.join(global_config.project_root, "dist", "index.html")
     try:
         with open(index_path, "r", encoding="utf-8") as f:
