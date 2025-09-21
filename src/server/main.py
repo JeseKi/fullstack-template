@@ -92,7 +92,7 @@ app.add_middleware(CacheControlMiddleware)
 
 # --- API 路由 ---
 # API 路由建议统一使用 /api 前缀，以避免与前端路由冲突
-@app.get("/api/health", summary="健康检查", tags=["System"])
+@app.get("/api/health", summary="健康检查", tags=["系统"])
 def health():
     """提供一个简单的健康检查端点，用于监控服务状态。"""
     return {"status": "ok"}
