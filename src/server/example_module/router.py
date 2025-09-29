@@ -28,7 +28,7 @@ router = APIRouter(prefix="/api/example", tags=["示例"])
     response_description="返回服务状态信息",
     responses={
         200: {"description": "服务正常运行"},
-    }
+    },
 )
 async def ping() -> dict[str, str]:
     return {"message": "pong"}
@@ -44,7 +44,7 @@ async def ping() -> dict[str, str]:
     responses={
         201: {"description": "项目创建成功"},
         400: {"description": "请求参数错误"},
-    }
+    },
 )
 async def create_item(payload: ItemCreate, db: Session = Depends(get_db)):
     def _create():
@@ -62,7 +62,7 @@ async def create_item(payload: ItemCreate, db: Session = Depends(get_db)):
     responses={
         200: {"description": "获取项目成功"},
         404: {"description": "项目不存在"},
-    }
+    },
 )
 async def get_item(item_id: int, db: Session = Depends(get_db)):
     def _get():

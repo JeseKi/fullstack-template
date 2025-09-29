@@ -46,13 +46,13 @@ class GlobalConfig(BaseSettings):
         title="应用密钥",
         description="用于会话/签名等场景（可选）",
     )
-    
+
     project_root: Path = Field(
         default=Path.cwd(),
         title="项目根目录",
         description="相对项目根目录的相对路径",
     )
-    
+
     @property
     def allowed_origins(self) -> List[str]:
         """允许的跨域来源
