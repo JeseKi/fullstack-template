@@ -14,13 +14,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from src.server.database import get_db
-from src.server.config import global_config
-from .config import auth_config
+from .dependencies import get_current_user
 from .models import User
 from . import service
 from .schemas import (
@@ -34,39 +31,6 @@ from .schemas import (
 
 router = APIRouter(prefix="/api/auth", tags=["认证"])
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
-) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="无法验证凭据",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-    if global_config.app_env in ["dev", "test"] and token == auth_config.test_token:
-        user = db.query(User).filter(User.id == 1).first()
-        if user:
-            return user
-        raise credentials_exception
-
-    try:
-        payload = jwt.decode(
-            token, auth_config.jwt_secret_key, algorithms=[auth_config.jwt_algorithm]
-        )
-        username: str | None = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-
-    user = service.get_user_by_username(db, username=username)
-    if user is None:
-        raise credentials_exception
-    return user
-
 
 @router.post(
     "/login",
@@ -77,7 +41,7 @@ async def get_current_user(
     responses={
         200: {"description": "登录成功"},
         401: {"description": "用户名或密码错误"},
-    }
+    },
 )
 async def login_for_access_token(login_data: UserLogin, db: Session = Depends(get_db)):
     user = service.authenticate_user(db, login_data.username, login_data.password)
@@ -107,7 +71,7 @@ async def login_for_access_token(login_data: UserLogin, db: Session = Depends(ge
     responses={
         201: {"description": "用户创建成功"},
         400: {"description": "用户名已被注册"},
-    }
+    },
 )
 async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
     db_user = service.get_user_by_username(db, username=user_data.username)
@@ -128,7 +92,7 @@ async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
     responses={
         200: {"description": "令牌刷新成功"},
         401: {"description": "无效的刷新令牌"},
-    }
+    },
 )
 async def refresh_access_token(current_user: User = Depends(get_current_user)):
     new_access_token = service.create_access_token(data={"sub": current_user.username})
@@ -151,7 +115,7 @@ async def refresh_access_token(current_user: User = Depends(get_current_user)):
     responses={
         200: {"description": "获取用户资料成功"},
         401: {"description": "未认证或令牌无效"},
-    }
+    },
 )
 async def get_profile(current_user: User = Depends(get_current_user)):
     return current_user
@@ -167,7 +131,7 @@ async def get_profile(current_user: User = Depends(get_current_user)):
         200: {"description": "用户资料更新成功"},
         400: {"description": "邮箱已被使用"},
         401: {"description": "未认证或令牌无效"},
-    }
+    },
 )
 async def update_profile(
     user_data: UserUpdate,
@@ -193,7 +157,7 @@ async def update_profile(
         200: {"description": "密码修改成功"},
         400: {"description": "旧密码不正确"},
         401: {"description": "未认证或令牌无效"},
-    }
+    },
 )
 async def change_current_user_password(
     password_data: PasswordChange,
