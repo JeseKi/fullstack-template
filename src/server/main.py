@@ -63,7 +63,7 @@ if global_config.app_env == "prod":
     fastapi_kwargs["redoc_url"] = None
     logger.info("生产环境：API 文档已禁用")
 
-app = FastAPI(**fastapi_kwargs)
+app = FastAPI(**fastapi_kwargs)  # type: ignore
 
 app.add_middleware(
     CORSMiddleware,

@@ -94,6 +94,12 @@ def init_database() -> None:
         logger.warning(f"引导管理员失败（可忽略开发环境）：{e}")
 
 
+def import_all_models() -> None:
+    """导入所有模型。"""
+    from src.server.auth import models as _1  # noqa
+    from src.server.example_module import models as _2  # noqa
+
+
 def get_database_info() -> DatabaseInfo:
     """获取数据库信息。"""
     return DatabaseInfo(
