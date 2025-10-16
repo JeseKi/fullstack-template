@@ -12,10 +12,11 @@ FROM python:3.10-slim
 WORKDIR /app
 COPY .env .
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install uv
+RUN uv pip install --no-cache-dir -r requirements.txt --system
 
 COPY src/server/ ./src/server/
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 8000
-CMD ["python","-m","src.server.run"]
+CMD ["python", "run.py"]
