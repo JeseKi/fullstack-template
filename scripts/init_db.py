@@ -13,6 +13,10 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).parent.parent))
+
 from loguru import logger
 
 from src.server.database import init_database, get_database_info, engine
