@@ -1,10 +1,10 @@
 # Fullstack Template (FastAPI + React/Vite)
 
-一个极简但开箱即用的全栈模板：后端基于 FastAPI + SQLAlchemy（SQLite），前端基于 React 19 + Vite 7 + Tailwind CSS 4。内置认证模块与示例业务模块，并提供完善的中文注释与测试样例。
+一个极简但开箱即用的全栈模板：后端基于 FastAPI + SQLAlchemy（SQLite）+ Alembic，前端基于 React 19 + Vite 7 + Tailwind CSS 4 + Ant Design。内置认证模块与示例业务模块，并提供完善的中文注释与测试样例。
 
 ### 技术栈
-- 后端：FastAPI、SQLAlchemy、Pydantic、python-jose[jwt]、bcrypt、pytest、loguru
-- 前端：React 19、Vite 7、React Router 7、Tailwind CSS 4、shadcn/ui、axios、TypeScript 5
+- 后端：FastAPI、SQLAlchemy、Pydantic、python-jose[jwt]、bcrypt、pytest、pytest-asyncio、mypy、ruff、loguru、Alembic
+- 前端：React 19、Vite 7、React Router 7、Tailwind CSS 4、Ant Design、Lucide React、axios、TypeScript 5
 
 ### 目录结构（关键项）
 ```
@@ -13,27 +13,40 @@
 ├── package.json                   # 前端脚本与依赖（pnpm 建议）
 ├── pnpm-lock.yaml
 ├── requirements.txt               # 后端依赖
+├── requirements.in                # 后端依赖声明（uv 管理）
+├── alembic.ini                    # 数据库迁移配置
 ├── .env.example                   # 环境变量示例
 ├── vite.config.ts                 # Vite 配置
 ├── tsconfig*.json                 # TS 配置
+├── mypy.ini                       # mypy 类型检查配置
+├── pytest.ini                     # pytest 测试配置
 ├── src/
 │   ├── client/                    # 前端应用
 │   │   ├── main.tsx               # React 入口
 │   │   ├── App.tsx
 │   │   ├── index.css              # Tailwind 入口样式
 │   │   ├── tailwind.config.js
-│   │   └── postcss.config.js
+│   │   ├── postcss.config.js
+│   │   ├── components/            # React 组件
+│   │   ├── pages/                 # 页面组件
+│   │   ├── hooks/                 # 自定义 hooks
+│   │   ├── lib/                   # 工具库与 API 调用
+│   │   └── providers/             # 上下文 Provider
 │   └── server/                    # 后端应用
 │       ├── main.py                # FastAPI 应用（挂载各模块）
-│       ├── run.py                 # 本地启动脚本（uvicorn 封装）
 │       ├── config.py              # 全局配置与 CORS 解析
 │       ├── database.py            # SQLAlchemy 连接与初始化
 │       ├── auth/                  # 认证模块
-│       │   ├── router.py / service.py / models.py / schemas.py
-│       │   └── README.md          # 模块接口文档
+│       │   ├── models.py / schemas.py / router.py / service.py / dao.py
+│       │   ├── README.md          # 模块接口文档
+│       │   └── tests/             # 单元测试
 │       └── example_module/        # 示例模块
-│           ├── router.py / service.py / models.py / schemas.py
-│           └── README.md          # 模块接口文档
+│           ├── models.py / schemas.py / router.py / service.py / dao.py
+│           ├── README.md          # 模块接口文档
+│           └── tests/             # 单元测试
+├── alembic/                       # Alembic 数据库迁移目录
+│   ├── versions/                  # 迁移文件
+│   └── env.py
 └── scripts/
     └── init_db.py                 # 数据库 CLI（检查/重置）
 ```
@@ -68,7 +81,7 @@ pnpm install
 4) 启动后端（终端 A）
 ```bash
 # 推荐
-python -m src.server.run
+python run.py
 # 或
 uvicorn src.server.main:app --reload --port 8000
 ```
@@ -107,13 +120,13 @@ LOG_LEVEL=info
 使用内置脚本初始化/检查数据库：
 ```bash
 # 仅初始化（幂等，若不存在则创建）
-python -m scripts.init_db
+python scripts/init_db.py
 
 # 检查当前表
-python -m scripts.init_db --check
+python scripts/init_db.py --check
 
 # 重置并初始化（删除现有文件后再创建）
-python -m scripts.init_db --reset
+python scripts/init_db.py --reset
 ```
 
 ---
@@ -131,17 +144,29 @@ curl http://localhost:8000/api/example/ping
 
 ## 前端开发约定
 - 入口：`index.html` -> `src/client/main.tsx` -> `src/client/App.tsx`
-- UI：Tailwind CSS 4 已接入，样式入口 `src/client/index.css`
-- 路由：已接入 React Router（按需扩展）
-- UI 组件：`@shadcn/ui` 可按需引入
-- API 调用：推荐使用 `axios`，可在 `src/client` 下建立 `lib/http.ts` 与后端约定 `baseURL`
+- UI：Tailwind CSS 4 + Ant Design，可无缝配合使用；样式入口 `src/client/index.css`
+- 路由：已接入 React Router 7（按需扩展）
+- UI 组件：推荐使用 Ant Design 组件库，也可使用 `lucide-react` 作为图标库
+- API 调用：推荐使用 `axios`，已配置在 `src/client/lib/` 下
 
 前端常用脚本：
 ```bash
 pnpm dev       # 本地开发
 pnpm build     # 生产构建（输出 dist/）
 pnpm preview   # 本地预览生产构建
-pnpm lint      # ESLint
+pnpm lint      # ESLint 代码检查
+```
+
+## 后端开发工具
+```bash
+# 类型检查
+mypy src/server
+
+# 代码格式检查
+ruff check src/server
+
+# 代码自动格式化
+ruff format src/server
 ```
 
 ---
@@ -149,7 +174,7 @@ pnpm lint      # ESLint
 ## 测试
 - 后端测试：
 ```bash
-pytest -q
+python -m pytest . -q
 ```
 
 - 前端目前未内置单测框架（可选接入 Vitest/RTL）。
