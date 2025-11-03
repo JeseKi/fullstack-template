@@ -14,10 +14,11 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, Integer, DateTime, Text
+from sqlalchemy import String, Integer, DateTime, Text, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.server.database import Base
+from .schemas import UserRole, UserStatus
 import bcrypt
 
 
@@ -30,8 +31,12 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     name: Mapped[Optional[str]] = mapped_column(String(100), default=None)
     remark: Mapped[Optional[str]] = mapped_column(Text, default=None)
-    role: Mapped[str] = mapped_column(String(20), nullable=False, default="user")
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="active")
+    role: Mapped[UserRole] = mapped_column(
+        SQLEnum(UserRole), nullable=False, default=UserRole.USER
+    )
+    status: Mapped[UserStatus] = mapped_column(
+        SQLEnum(UserStatus), nullable=False, default=UserStatus.ACTIVE
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

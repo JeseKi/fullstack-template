@@ -6,8 +6,27 @@
 - `UserProfile`、`UserCreate`、`UserUpdate`、`UserLogin`、`TokenResponse`、`PasswordChange`
 """
 
+from enum import Enum
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Optional
+
+
+class UserRole(str, Enum):
+    """
+    用户角色枚举
+    """
+
+    USER = "user"
+    ADMIN = "admin"
+
+
+class UserStatus(str, Enum):
+    """
+    用户状态枚举
+    """
+
+    ACTIVE = "active"
+    INACTIVE = "inactive"
 
 
 class UserProfile(BaseModel):
@@ -15,8 +34,8 @@ class UserProfile(BaseModel):
     username: str
     email: EmailStr
     name: Optional[str] = Field(default=None)
-    role: str
-    status: str
+    role: UserRole
+    status: UserStatus
 
     model_config = ConfigDict(from_attributes=True)
 

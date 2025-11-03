@@ -93,6 +93,7 @@ def init_test_database(test_db_engine) -> None:
     session = TestingSessionLocal()
     try:
         from src.server.auth.models import User
+        from src.server.auth.schemas import UserRole
 
         exists = session.query(User).order_by(User.id.asc()).first()
         if not exists:
@@ -100,7 +101,7 @@ def init_test_database(test_db_engine) -> None:
                 username="admin",
                 email="admin@example.com",
                 name="默认管理员",
-                role="admin",
+                role=UserRole.ADMIN,
             )
             admin.set_password("admin123")
             session.add(admin)
