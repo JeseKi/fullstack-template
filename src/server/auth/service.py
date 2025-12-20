@@ -82,10 +82,10 @@ def change_password(
 
 def bootstrap_default_admin(session: Session) -> None:
     """引导默认管理员（幂等）。用户名取邮箱 @ 前缀。"""
-    admin_email = "admin@example.com"
-    admin_username = admin_email.split("@")[0]
+    admin_email = auth_config.init_admin_email
+    admin_username = auth_config.init_admin_name
     user = get_user_by_username(session, admin_username)
-    password = "AdminPass123"
+    password = auth_config.init_admin_password
     if user:
         return
     try:

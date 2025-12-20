@@ -157,7 +157,7 @@ def test_bootstrap_default_admin(test_db_session: Session):
     assert user.username == "admin"
     assert user.email == "admin@example.com"
     assert user.role == UserRole.ADMIN
-    assert user.check_password("AdminPass123") is True
+    assert user.check_password("admin123") is True
 
     # 测试重复调用不会创建重复用户
     bootstrap_default_admin(test_db_session)
