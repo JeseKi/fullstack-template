@@ -61,6 +61,7 @@ fastapi_kwargs = {
 if global_config.app_env == "prod":
     fastapi_kwargs["docs_url"] = None
     fastapi_kwargs["redoc_url"] = None
+    fastapi_kwargs["openapi_url"] = None
     logger.info("生产环境：API 文档已禁用")
 
 app = FastAPI(**fastapi_kwargs)  # type: ignore
