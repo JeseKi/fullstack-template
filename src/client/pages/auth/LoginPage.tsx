@@ -41,6 +41,9 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const locationState = location.state as { from?: { pathname?: string }; registerSuccess?: boolean } | undefined
+  const registerSuccess = locationState?.registerSuccess ?? false
+
   useEffect(() => {
     if (!loading && isAuthenticated) {
       navigate('/', { replace: true })
@@ -53,7 +56,7 @@ export default function LoginPage() {
     setError(null)
     try {
       await login(values)
-      const fromState = location.state as { from?: { pathname?: string } } | undefined
+      const fromState = locationState
       const redirectPath = fromState?.from?.pathname ?? '/'
       message.success('欢迎回来')
       navigate(redirectPath, { replace: true })
@@ -98,6 +101,7 @@ export default function LoginPage() {
               输入账号信息以访问现代化的前端模板。
             </Typography.Text>
           </div>
+          {registerSuccess && <Alert type="success" showIcon message="注册成功，请使用新账号登录。" style={{ marginBottom: 0 }} />}
           {error && <Alert type="error" showIcon message={error} />}
           <Form
             form={form}

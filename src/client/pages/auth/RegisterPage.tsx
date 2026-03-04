@@ -40,7 +40,6 @@ export default function RegisterPage() {
   const [form] = Form.useForm<{ username: string; email: string; password: string; confirmPassword: string }>()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -53,12 +52,10 @@ export default function RegisterPage() {
     const { confirmPassword: _confirmPassword, ...registerPayload } = values
     setSubmitting(true)
     setError(null)
-    setSuccessMessage(null)
     try {
       await register(registerPayload)
-      setSuccessMessage('注册成功，请使用新账号登录。')
-      message.success('注册成功')
-      form.resetFields()
+      message.success('注册成功，请登录')
+      navigate('/login', { state: { registerSuccess: true } })
     } catch (err) {
       const text = resolveErrorMessage(err)
       setError(text)
@@ -100,7 +97,6 @@ export default function RegisterPage() {
             </Typography.Text>
           </div>
           {error && <Alert type="error" showIcon message={error} />}
-          {successMessage && <Alert type="success" showIcon message={successMessage} />}
           <Form
             form={form}
             layout="vertical"
