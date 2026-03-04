@@ -4,6 +4,8 @@ setup:
 	pip install uv --break-system-packages
 	uv venv .venv --python 3.11
 	. .venv/bin/activate && uv pip install -r requirements.txt
+	npm i -g pnpm
+	pnpm i
 
 build:
 	pnpm build
