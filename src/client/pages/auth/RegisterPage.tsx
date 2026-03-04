@@ -37,7 +37,7 @@ export default function RegisterPage() {
   const { register, loading, isAuthenticated } = useAuth()
   const { message } = App.useApp()
 
-  const [form] = Form.useForm<{ username: string; email: string; password: string }>()
+  const [form] = Form.useForm<{ username: string; email: string; password: string; confirmPassword: string }>()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -48,12 +48,14 @@ export default function RegisterPage() {
     }
   }, [isAuthenticated, loading, navigate])
 
-  const handleSubmit = async (values: { username: string; email: string; password: string }) => {
+  const handleSubmit = async (values: { username: string; email: string; password: string; confirmPassword: string }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword: _confirmPassword, ...registerPayload } = values
     setSubmitting(true)
     setError(null)
     setSuccessMessage(null)
     try {
-      await register(values)
+      await register(registerPayload)
       setSuccessMessage('注册成功，请使用新账号登录。')
       message.success('注册成功')
       form.resetFields()
@@ -150,6 +152,29 @@ export default function RegisterPage() {
                 size="large"
                 prefix={<LockOutlined />}
                 placeholder="请输入密码"
+                autoComplete="new-password"
+              />
+            </Form.Item>
+            <Form.Item
+              label="确认密码"
+              name="confirmPassword"
+              dependencies={['password']}
+              rules={[
+                { required: true, message: '请再次输入密码' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject(new Error('两次输入的密码不一致'))
+                  },
+                }),
+              ]}
+            >
+              <Input.Password
+                size="large"
+                prefix={<LockOutlined />}
+                placeholder="请再次输入密码"
                 autoComplete="new-password"
               />
             </Form.Item>
