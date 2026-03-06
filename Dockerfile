@@ -18,6 +18,8 @@ RUN uv pip install --no-cache-dir -r requirements.txt --system
 COPY src/server/ ./src/server/
 COPY --from=builder /app/dist ./dist
 COPY run.py .
+COPY alembic.ini ./alembic.ini
+COPY alembic ./alembic
 
 EXPOSE 8000
 CMD ["python", "run.py"]
