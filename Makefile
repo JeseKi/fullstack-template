@@ -1,10 +1,10 @@
 .PHONY: build dev lint test check
 
 setup:
-	pip install uv --break-system-packages
-	uv venv .venv --python 3.11
+	@command -v uv >/dev/null 2>&1 || pip install uv --break-system-packages
+	@[ -d .venv ] || uv venv .venv --python 3.11
 	. .venv/bin/activate && uv pip install -r requirements.txt
-	npm i -g pnpm
+	@command -v pnpm >/dev/null 2>&1 || npm i -g pnpm
 	pnpm i
 
 build:
