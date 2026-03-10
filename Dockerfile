@@ -20,6 +20,8 @@ COPY --from=builder /app/dist ./dist
 COPY run.py .
 COPY alembic.ini ./alembic.ini
 COPY alembic ./alembic
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
-CMD ["python", "run.py"]
+CMD ["/app/entrypoint.sh"]
