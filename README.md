@@ -107,12 +107,20 @@ ALLOWED_ORIGINS=["http://localhost:5173"]
 DATABASE_PATH=database.db
 PORT=8000
 LOG_LEVEL=info
+LOG_DIR=logs
+LOG_ROTATION=20 MB
+LOG_RETENTION=14 days
+LOG_SERIALIZE=false
 ```
 
 - CORS 解析支持 JSON 数组、逗号分隔或单值，例如：
   - `ALLOWED_ORIGINS='["http://localhost:5173"]'`
   - `ALLOWED_ORIGINS="http://localhost:5173,http://localhost:3000"`
   - `ALLOWED_ORIGINS="*"`
+- 本地日志默认输出到 `logs/` 目录：
+  - `app.log`：应用日志
+  - `access.log`：HTTP 请求留痕
+  - `error.log`：错误日志
 
 ---
 

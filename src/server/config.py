@@ -13,10 +13,10 @@
 - 提供 CORS 允许源解析
 """
 
-import os
 import json
-from typing import List
+import os
 from pathlib import Path
+from typing import List
 
 from dotenv import load_dotenv
 from pydantic import Field
@@ -51,6 +51,31 @@ class GlobalConfig(BaseSettings):
         default=Path.cwd(),
         title="项目根目录",
         description="相对项目根目录的相对路径",
+    )
+
+    log_level: str = Field(default="info", title="日志级别")
+
+    log_dir: Path = Field(
+        default=Path("logs"),
+        title="日志目录",
+        description="相对项目根目录的相对路径",
+    )
+
+    log_rotation: str = Field(
+        default="20 MB",
+        title="日志轮转策略",
+        description="Loguru rotation 配置",
+    )
+
+    log_retention: str = Field(
+        default="14 days",
+        title="日志保留策略",
+        description="Loguru retention 配置",
+    )
+
+    log_serialize: bool = Field(
+        default=False,
+        title="是否输出 JSON 日志",
     )
 
     @property

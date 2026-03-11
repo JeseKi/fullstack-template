@@ -7,6 +7,8 @@ FastAPI 应用主入口。
 
 from contextlib import asynccontextmanager
 from pathlib import Path
+from time import perf_counter
+from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +20,7 @@ from starlette.types import Scope
 
 from src.server.config import global_config
 from src.server.database import get_database_info, init_database
+from src.server.logging_config import setup_logging
 
 # 路由模块
 from src.server.auth.router import router as auth_router
@@ -28,6 +31,8 @@ PROJECT_ROOT = Path(global_config.project_root)
 DIST_DIR = PROJECT_ROOT / "dist"
 INDEX_FILE = DIST_DIR / "index.html"
 ASSETS_DIRNAME = "assets"  # Vite 默认的 hash 产物目录
+
+setup_logging()
 
 
 # --- 应用生命周期 ---
@@ -95,7 +100,58 @@ class CacheControlMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    """
+    记录每个 HTTP 请求的关键元数据，便于本地排查问题。
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID") or uuid4().hex
+        client_ip = request.client.host if request.client else "-"
+        request.state.request_id = request_id
+
+        started_at = perf_counter()
+
+        try:
+            with logger.contextualize(
+                request_id=request_id,
+                client_ip=client_ip,
+                user_id=getattr(request.state, "user_id", "-"),
+            ):
+                response: Response = await call_next(request)
+        except Exception:
+            duration_ms = (perf_counter() - started_at) * 1000
+            logger.bind(
+                log_type="access",
+                request_id=request_id,
+                client_ip=client_ip,
+                user_id=getattr(request.state, "user_id", "-"),
+            ).exception(
+                f"{request.method} {request.url.path} -> 500 in {duration_ms:.2f} ms"
+            )
+            raise
+
+        duration_ms = (perf_counter() - started_at) * 1000
+        user_id = getattr(request.state, "user_id", "-")
+        response.headers["X-Request-ID"] = request_id
+
+        access_message = (
+            f"{request.method} {request.url.path} -> "
+            f"{response.status_code} in {duration_ms:.2f} ms"
+        )
+        access_logger = logger.bind(
+            log_type="access",
+            request_id=request_id,
+            client_ip=client_ip,
+            user_id=user_id,
+        )
+        access_level = "ERROR" if response.status_code >= 500 else "INFO"
+        access_logger.log(access_level, access_message)
+        return response
+
+
 app.add_middleware(CacheControlMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
 
 
 # --- API 路由 ---
