@@ -1,10 +1,10 @@
 # Fullstack Template (FastAPI + React/Vite)
 
-一个极简但开箱即用的全栈模板：后端基于 FastAPI + SQLAlchemy（SQLite）+ Alembic，前端基于 React 19 + Vite 7 + Tailwind CSS 4 + Ant Design。内置认证模块与示例业务模块，并提供完善的中文注释与测试样例。
+一个极简但开箱即用的全栈模板：后端基于 FastAPI + SQLAlchemy（SQLite）+ Alembic，前端基于 React 19 + Vite 7 + Tailwind CSS 4 + shadcn/ui（Radix）+ sonner。内置认证模块与示例业务模块，并提供完善的中文注释与测试样例。
 
 ### 技术栈
 - 后端：FastAPI、SQLAlchemy、Pydantic、python-jose[jwt]、bcrypt、pytest、pytest-asyncio、mypy、ruff、loguru、Alembic
-- 前端：React 19、Vite 7、React Router 7、Tailwind CSS 4、Ant Design、Lucide React、axios、TypeScript 5
+- 前端：React 19、Vite 7、React Router 7、Tailwind CSS 4、shadcn/ui（Radix）、sonner、Lucide React、axios、TypeScript 5
 
 ### 目录结构（关键项）
 ```
@@ -152,9 +152,9 @@ curl http://localhost:8000/api/example/ping
 
 ## 前端开发约定
 - 入口：`index.html` -> `src/client/main.tsx` -> `src/client/App.tsx`
-- UI：Tailwind CSS 4 + Ant Design，可无缝配合使用；样式入口 `src/client/index.css`
+- UI：Tailwind CSS 4 + shadcn/ui（Radix），样式入口 `src/client/index.css`
 - 路由：已接入 React Router 7（按需扩展）
-- UI 组件：推荐使用 Ant Design 组件库，也可使用 `lucide-react` 作为图标库
+- UI 组件：推荐使用 shadcn/ui 组件库，也可使用 `lucide-react` 作为图标库
 - API 调用：推荐使用 `axios`，已配置在 `src/client/lib/` 下
 
 前端常用脚本：

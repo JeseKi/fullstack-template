@@ -1,25 +1,14 @@
 import { isAxiosError } from 'axios'
-import {
-  Alert,
-  App,
-  Button,
-  Card,
-  Flex,
-  Form,
-  Input,
-  Space,
-  Spin,
-  Typography,
-} from 'antd'
-import {
-  LockOutlined,
-  MailOutlined,
-  UserAddOutlined,
-  UserOutlined,
-} from '@ant-design/icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { Lock, Mail, User, UserPlus } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { Button } from '../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
+import { Input } from '../../components/ui/input'
+import { Alert, AlertDescription } from '../../components/ui/alert'
+import { Spinner } from '../../components/ui/spinner'
 
 function resolveErrorMessage(error: unknown): string {
   if (isAxiosError(error)) {
@@ -35,9 +24,19 @@ function resolveErrorMessage(error: unknown): string {
 export default function RegisterPage() {
   const navigate = useNavigate()
   const { register, loading, isAuthenticated } = useAuth()
-  const { message } = App.useApp()
 
-  const [form] = Form.useForm<{ username: string; email: string; password: string; confirmPassword: string }>()
+  const [values, setValues] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
+  const [fieldErrors, setFieldErrors] = useState<{
+    username?: string
+    email?: string
+    password?: string
+    confirmPassword?: string
+  }>({})
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -47,19 +46,53 @@ export default function RegisterPage() {
     }
   }, [isAuthenticated, loading, navigate])
 
-  const handleSubmit = async (values: { username: string; email: string; password: string; confirmPassword: string }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword: _confirmPassword, ...registerPayload } = values
-    setSubmitting(true)
+  const validate = () => {
+    const nextErrors: typeof fieldErrors = {}
+    const username = values.username.trim()
+    const email = values.email.trim()
+    if (!username) {
+      nextErrors.username = '请输入用户名'
+    } else if (username.length < 3) {
+      nextErrors.username = '用户名至少 3 个字符'
+    }
+    if (!email) {
+      nextErrors.email = '请输入邮箱地址'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextErrors.email = '请输入正确的邮箱格式'
+    }
+    if (!values.password) {
+      nextErrors.password = '请输入密码'
+    } else if (values.password.length < 8) {
+      nextErrors.password = '密码至少 8 个字符'
+    }
+    if (!values.confirmPassword) {
+      nextErrors.confirmPassword = '请再次输入密码'
+    } else if (values.confirmPassword !== values.password) {
+      nextErrors.confirmPassword = '两次输入的密码不一致'
+    }
+    setFieldErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     setError(null)
+    if (!validate()) {
+      return
+    }
+    setSubmitting(true)
     try {
-      await register(registerPayload)
-      message.success('注册成功，请登录')
+      await register({
+        username: values.username.trim(),
+        email: values.email.trim(),
+        password: values.password,
+      })
+      toast.success('注册成功，请登录')
       navigate('/login', { state: { registerSuccess: true } })
     } catch (err) {
       const text = resolveErrorMessage(err)
       setError(text)
-      message.error(text)
+      toast.error(text)
     } finally {
       setSubmitting(false)
     }
@@ -67,134 +100,120 @@ export default function RegisterPage() {
 
   if (loading) {
     return (
-      <Flex
-        align="center"
-        justify="center"
-        style={{ minHeight: '100vh' }}
-      >
-        <Spin tip="正在加载，请稍候" size="large" />
-      </Flex>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-muted-foreground">
+          <Spinner />
+          <span className="text-sm">正在加载，请稍候</span>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Flex
-      align="center"
-      justify="center"
-      style={{ minHeight: '100vh', padding: '48px 16px' }}
-    >
-      <Card
-        bordered={false}
-        style={{ width: '100%', maxWidth: 420, boxShadow: '0 16px 40px rgba(15, 23, 42, 0.12)' }}
-      >
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
-          <div>
-            <Typography.Title level={3} style={{ marginBottom: 8 }}>
-              创建新账号
-            </Typography.Title>
-            <Typography.Text type="secondary">
-              填写基础信息即可体验最新版本的前端模板能力。
-            </Typography.Text>
-          </div>
-          {error && <Alert type="error" showIcon message={error} />}
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSubmit}
-            requiredMark={false}
-            autoComplete="on"
-          >
-            <Form.Item
-              label="用户名"
-              name="username"
-              rules={[
-                { required: true, message: '请输入用户名' },
-                { min: 3, message: '用户名至少 3 个字符' },
-              ]}
-            >
-              <Input
-                size="large"
-                prefix={<UserOutlined />}
-                placeholder="请输入用户名"
-                autoComplete="username"
-                allowClear
-              />
-            </Form.Item>
-            <Form.Item
-              label="邮箱"
-              name="email"
-              rules={[
-                { required: true, message: '请输入邮箱地址' },
-                { type: 'email', message: '请输入正确的邮箱格式' },
-              ]}
-            >
-              <Input
-                size="large"
-                prefix={<MailOutlined />}
-                placeholder="请输入邮箱地址"
-                autoComplete="email"
-                allowClear
-              />
-            </Form.Item>
-            <Form.Item
-              label="密码"
-              name="password"
-              rules={[
-                { required: true, message: '请输入密码' },
-                { min: 8, message: '密码至少 8 个字符' },
-              ]}
-            >
-              <Input.Password
-                size="large"
-                prefix={<LockOutlined />}
-                placeholder="请输入密码"
-                autoComplete="new-password"
-              />
-            </Form.Item>
-            <Form.Item
-              label="确认密码"
-              name="confirmPassword"
-              dependencies={['password']}
-              rules={[
-                { required: true, message: '请再次输入密码' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
-                      return Promise.resolve()
-                    }
-                    return Promise.reject(new Error('两次输入的密码不一致'))
-                  },
-                }),
-              ]}
-            >
-              <Input.Password
-                size="large"
-                prefix={<LockOutlined />}
-                placeholder="请再次输入密码"
-                autoComplete="new-password"
-              />
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                icon={<UserAddOutlined />}
-                loading={submitting}
-                block
-              >
-                注册
-              </Button>
-            </Form.Item>
-          </Form>
-          <Flex justify="center" gap={8}>
-            <Typography.Text type="secondary">已有账号？</Typography.Text>
-            <Link to="/login" className="font-medium text-sky-600">
+    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md border-none shadow-xl">
+        <CardHeader className="space-y-2">
+          <CardTitle>创建新账号</CardTitle>
+          <CardDescription>填写基础信息即可体验最新版本的前端模板能力。</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {error && (
+            <Alert className="border-destructive/40 text-destructive">
+              <AlertDescription className="text-destructive">{error}</AlertDescription>
+            </Alert>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">用户名</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={values.username}
+                  onChange={(event) => {
+                    setValues((prev) => ({ ...prev, username: event.target.value }))
+                    setFieldErrors((prev) => ({ ...prev, username: undefined }))
+                  }}
+                  placeholder="请输入用户名"
+                  autoComplete="username"
+                  className="pl-9"
+                />
+              </div>
+              {fieldErrors.username && (
+                <p className="text-xs text-destructive">{fieldErrors.username}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">邮箱</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={values.email}
+                  onChange={(event) => {
+                    setValues((prev) => ({ ...prev, email: event.target.value }))
+                    setFieldErrors((prev) => ({ ...prev, email: undefined }))
+                  }}
+                  placeholder="请输入邮箱地址"
+                  autoComplete="email"
+                  className="pl-9"
+                />
+              </div>
+              {fieldErrors.email && (
+                <p className="text-xs text-destructive">{fieldErrors.email}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">密码</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="password"
+                  value={values.password}
+                  onChange={(event) => {
+                    setValues((prev) => ({ ...prev, password: event.target.value }))
+                    setFieldErrors((prev) => ({ ...prev, password: undefined }))
+                  }}
+                  placeholder="请输入密码"
+                  autoComplete="new-password"
+                  className="pl-9"
+                />
+              </div>
+              {fieldErrors.password && (
+                <p className="text-xs text-destructive">{fieldErrors.password}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">确认密码</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="password"
+                  value={values.confirmPassword}
+                  onChange={(event) => {
+                    setValues((prev) => ({ ...prev, confirmPassword: event.target.value }))
+                    setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }))
+                  }}
+                  placeholder="请再次输入密码"
+                  autoComplete="new-password"
+                  className="pl-9"
+                />
+              </div>
+              {fieldErrors.confirmPassword && (
+                <p className="text-xs text-destructive">{fieldErrors.confirmPassword}</p>
+              )}
+            </div>
+            <Button type="submit" disabled={submitting} className="w-full">
+              <UserPlus className="h-4 w-4" />
+              注册
+            </Button>
+          </form>
+          <div className="flex items-center justify-center gap-2 text-sm">
+            <span className="text-muted-foreground">已有账号？</span>
+            <Link to="/login" className="font-medium text-primary">
               返回登录
             </Link>
-          </Flex>
-        </Space>
+          </div>
+        </CardContent>
       </Card>
-    </Flex>
+    </div>
   )
 }
