@@ -16,6 +16,9 @@ compile:
 dev:
 	python run.py
 
+deploy:
+	sudo docker compose up -d --build
+
 lint:
 	pnpm lint
 	ruff check --fix
